@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS TRACKER | Student & Young Adult Personal Budget Planner</title>
+  <meta name="description" content="A modern, friendly personal budget planner designed for college students and young adults. Track income, expenses, category spending limits, and savings goals.">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- ================================================================= -->
+    <!-- DESKTOP SIDEBAR NAVIGATION                                        -->
+    <!-- ================================================================= -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-section">
+        <div class="brand-logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            JS TRACKER
+            <span class="badge-tag">STUDENT</span>
+          </div>
+          <div class="brand-subtitle">Smart Student Budgeting</div>
+        </div>
+      </div>
+
+      <div class="sidebar-cta-wrap">
+        <button class="btn-quick-add btn-open-tx-modal" id="sidebarAddTxBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Log Transaction
+        </button>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-view="dashboard" id="navDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Dashboard
+        </button>
+
+        <button class="nav-item" data-view="transactions" id="navTransactions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          Transactions
+        </button>
+
+        <button class="nav-item" data-view="budgets" id="navBudgets">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+          </svg>
+          Budgets
+        </button>
+
+        <button class="nav-item" data-view="goals" id="navGoals">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+          Savings Goals
+        </button>
+
+        <button class="nav-item" data-view="reports" id="navReports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Monthly Reports
+        </button>
+
+        <button class="nav-item" data-view="sms" id="navSms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          SMS Tracker
+          <span class="badge-count" id="smsNavBadge" style="background: rgba(45, 212, 191, 0.25); color: #2dd4bf;">Sync</span>
+        </button>
+      </nav>
+
+      <div class="user-profile-badge">
+        <div class="user-avatar" id="sidebarUserAvatar">AR</div>
+        <div class="user-info">
+          <span class="user-name" id="sidebarUserName">Alex Rivera</span>
+          <span class="user-status" id="sidebarUserStatus">Metro State Senior</span>
+        </div>
+        <button class="btn-sidebar-logout" id="btnSidebarLogout" title="Log Out / Switch Account" aria-label="Log Out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ================================================================= -->
+    <!-- MAIN WRAPPER                                                      -->
+    <!-- ================================================================= -->
+    <div class="main-wrapper">
+
+      <!-- TOP BAR -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="page-headline">
+            <h1 class="page-title" id="pageTitle">Student Budget Overview</h1>
+            <span class="page-subtitle" id="pageSubtitle">Track spending, stay within limits, and protect your savings buffer.</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="month-picker-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <select id="headerMonthSelect" aria-label="Select Budget Month">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <button class="btn-header-secondary" id="btnExportData" title="Export Backup JSON">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export
+          </button>
+
+          <label class="btn-header-secondary" style="cursor: pointer;" title="Import Backup JSON">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Import
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+          </label>
+
+          <button class="btn-header-secondary" id="btnResetSampleData" title="Reset to Sample Student Data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+              <path d="M21 3v5h-5"></path>
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+              <path d="M3 21v-5h5"></path>
+            </svg>
+            Reset Demo
+          </button>
+
+          <button class="btn-header-secondary" id="btnHeaderAuth" title="Switch User or Log In">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Account
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW CONTAINER -->
+      <main class="page-container">
+
+        <!-- ============================================================= -->
+        <!-- VIEW 1: DASHBOARD                                             -->
+        <!-- ============================================================= -->
+        <section class="view-section active" id="view-dashboard">
+          
+          <!-- Student Welcome Banner -->
+          <div class="student-banner">
+            <div class="banner-content">
+              <div class="banner-text">
+                <h2>Welcome back, Alex! 🎓</h2>
+                <p>You're managing your Fall 2026 semester budget. Your fixed expenses are on schedule and your savings emergency buffer is growing steadily.</p>
+              </div>
+              <div class="banner-stats-pill">
+                <div class="pill-stat">
+                  <span class="pill-label">Active Term</span>
+                  <span class="pill-val">Fall '26</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="pill-stat">
+                  <span class="pill-label">Tuition / Job</span>
+                  <span class="pill-val">CS Assistant</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Core Metric Summary Cards -->
+          <div class="metrics-grid">
+            <!-- 1. Total Income -->
+            <div class="metric-card">
+              <div class="metric-card-header">
+                <div class="metric-icon-wrap income">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                    <polyline points="17 6 23 6 23 12"></polyline>
+                  </svg>
+                </div>
+                <span class="metric-badge positive">+ Stipend &amp; Tutoring</span>
+              </div>
+              <span class="metric-label">Total Monthly Income</span>
+              <div class="metric-amount" id="dashIncomeVal">$0.00</div>
+              <div class="metric-footer">Includes campus work-study &amp; grants</div>
+            </div>
+
+            <!-- 2. Total Expenses -->
+            <div class="metric-card">
+              <div class="metric-card-header">
+                <div class="metric-icon-wrap expense">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                    <polyline points="17 18 23 18 23 12"></polyline>
+                  </svg>
+                </div>
+                <span class="metric-badge neutral">Current Month</span>
+              </div>
+              <span class="metric-label">Total Expenses</span>
+              <div class="metric-amount" id="dashExpenseVal">$0.00</div>
+              <div class="metric-footer">Rent, food, learning &amp; transit</div>
+            </div>
+
+            <!-- 3. Remaining Balance -->
+            <div class="metric-card">
+              <div class="metric-card-header">
+                <div class="metric-icon-wrap balance">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                  </svg>
+                </div>
+                <span class="metric-badge positive">Available Cash</span>
+              </div>
+              <span class="metric-label">Remaining Balance</span>
+              <div class="metric-amount" id="dashBalanceVal">$0.00</div>
+              <div class="metric-footer">Income minus spent expenses</div>
+            </div>
+
+            <!-- 4. Savings Progress -->
+            <div class="metric-card">
+              <div class="metric-card-header">
+                <div class="metric-icon-wrap savings">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                  </svg>
+                </div>
+                <span class="metric-badge positive" id="dashSavingsBadge">68% Funded</span>
+              </div>
+              <span class="metric-label">Savings Goals Stash</span>
+              <div class="metric-amount" id="dashSavingsVal">$0 / $0</div>
+              <div class="metric-footer">Emergency fund, laptop &amp; trips</div>
+            </div>
+          </div>
+
+          <!-- Category Budget Warnings (Helpful Messages) -->
+          <div class="budget-alerts-section">
+            <div class="alerts-header">
+              <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                Budget Notifications &amp; Smart Alerts
+              </h3>
+            </div>
+            <div class="alerts-container" id="dashBudgetAlerts">
+              <!-- Dynamically populated with warning banners -->
+            </div>
+          </div>
+
+          <!-- Two-Column Section: Chart + Recurring & Recent -->
+          <div class="dashboard-grid">
+            
+            <!-- Left Column: Budget vs Spending Chart -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <div>
+                  <h3 class="card-panel-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="20" x2="12" y2="10"></line>
+                      <line x1="18" y1="20" x2="18" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                    Monthly Category Budget vs. Spending
+                  </h3>
+                  <div class="card-panel-subtitle">Visual comparison of allocated limits against current expenditures</div>
+                </div>
+                <button class="btn-secondary" onclick="App.switchView('budgets')" style="padding: 5px 12px; font-size: 0.78rem;">
+                  Manage Limits
+                </button>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="dashBudgetChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Right Column: Upcoming Recurring Bills -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <div>
+                  <h3 class="card-panel-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Upcoming Recurring Expenses
+                  </h3>
+                  <div class="card-panel-subtitle">Monthly student bills &amp; subscriptions</div>
+                </div>
+              </div>
+              <div class="recurring-list" id="dashRecurringList">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Recent Transactions Card -->
+          <div class="card-panel" style="margin-top: 24px;">
+            <div class="card-panel-header">
+              <div>
+                <h3 class="card-panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Recent Transactions
+                </h3>
+                <div class="card-panel-subtitle">Latest entries logged for this month</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-secondary" onclick="App.switchView('transactions')" style="padding: 6px 12px; font-size: 0.8rem;">
+                  View All
+                </button>
+                <button class="btn-primary btn-open-tx-modal" style="padding: 6px 14px; font-size: 0.8rem;">
+                  + Add Entry
+                </button>
+              </div>
+            </div>
+            <div class="recent-tx-list" id="dashRecentTransactionsList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 2: TRANSACTIONS                                          -->
+        <!-- ============================================================= -->
+        <section class="view-section" id="view-transactions">
+          
+          <!-- Toolbar Card -->
+          <div class="toolbar-card">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" class="search-input" id="txSearchInput" placeholder="Search by description, notes, method...">
+            </div>
+
+            <div class="filters-group">
+              <select class="filter-select" id="txTypeFilter" aria-label="Filter by Type">
+                <option value="all">All Types</option>
+                <option value="expense">Expenses Only</option>
+                <option value="income">Income Only</option>
+              </select>
+
+              <select class="filter-select" id="txCategoryFilter" aria-label="Filter by Category">
+                <option value="all">All Categories</option>
+                <!-- Populated dynamically -->
+              </select>
+
+              <select class="filter-select" id="txSortFilter" aria-label="Sort Transactions">
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="amount-desc">Highest Amount</option>
+                <option value="amount-asc">Lowest Amount</option>
+              </select>
+
+              <button class="btn-primary btn-open-tx-modal" id="btnAddNewTx">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Transaction
+              </button>
+            </div>
+          </div>
+
+          <!-- Transactions Table -->
+          <div class="table-card">
+            <div style="padding: 12px 18px; background: #faf8f5; border-bottom: 1px solid var(--warm-border); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);" id="txFilteredCount">Showing entries</span>
+              <span style="font-size: 0.74rem; color: var(--text-muted);">Filtered for active month</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description &amp; Notes</th>
+                    <th>Category</th>
+                    <th>Payment Method</th>
+                    <th>Type</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="txEmptyState" style="display: none;">
+              <div class="empty-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+              <div class="empty-title">No transactions found</div>
+              <div class="empty-sub">Try changing your search keywords or filter options, or add a new transaction.</div>
+              <button class="btn-primary btn-open-tx-modal">+ Add First Transaction</button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 3: BUDGETS                                               -->
+        <!-- ============================================================= -->
+        <section class="view-section" id="view-budgets">
+          
+          <!-- Master Budget Progress Header -->
+          <div class="budgets-header-summary">
+            <div class="budget-score-row">
+              <div>
+                <div class="budget-score-title">Monthly Category Spending Limits</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                  Set spending ceilings to prevent student loan overdrafts and avoid overspending on discretionary items.
+                </div>
+              </div>
+              <div class="budget-total-stats">
+                <div class="total-stat-box">
+                  <span class="label">Total Spent</span>
+                  <span class="val" id="budgetTotalSpent">$0.00</span>
+                </div>
+                <div style="font-size: 1.5rem; color: var(--warm-border); font-weight: 300;">/</div>
+                <div class="total-stat-box">
+                  <span class="label">Total Budget Cap</span>
+                  <span class="val" id="budgetTotalCap">$0.00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="master-progress-wrap">
+              <div class="progress-bar-bg" style="height: 14px;">
+                <div class="progress-bar-fill normal" id="budgetMasterProgress" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards Grid for Each Expense Category -->
+          <div class="budget-cards-grid" id="budgetsCardsGrid">
+            <!-- Dynamically populated -->
+          </div>
+
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 4: SAVINGS GOALS                                         -->
+        <!-- ============================================================= -->
+        <section class="view-section" id="view-goals">
+          
+          <div class="goals-header-bar">
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--navy-900);">Your Student Savings Goals</h2>
+              <p style="font-size: 0.84rem; color: var(--text-muted);">Plan ahead for semester books, emergency buffers, travel, and post-grad relocation.</p>
+            </div>
+            <button class="btn-primary" id="btnOpenAddGoalModal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              + Create Savings Goal
+            </button>
+          </div>
+
+          <!-- Savings Goals Grid -->
+          <div class="goals-grid" id="goalsCardsGrid">
+            <!-- Dynamically populated -->
+          </div>
+
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 5: MONTHLY REPORTS                                       -->
+        <!-- ============================================================= -->
+        <section class="view-section" id="view-reports">
+          
+          <!-- Month Comparison Header Card -->
+          <div class="comparison-card" style="margin-bottom: 24px;">
+            <div class="comparison-header">
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-900);">Month-over-Month Comparative Analytics</h3>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                  Comparing <strong id="reportCurrentMonthLabel">September 2026</strong> against <strong id="reportPrevMonthLabel">August 2026</strong>
+                </div>
+              </div>
+              <button class="btn-secondary" id="btnPrintReport">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print / Save PDF Report
+              </button>
+            </div>
+
+            <div class="comparison-stats-row">
+              <div class="comp-stat-box">
+                <span class="label">Monthly Income</span>
+                <span class="curr-val" id="repIncomeVal">$0.00</span>
+                <span class="delta-pill" id="repIncomeDelta">vs last month</span>
+              </div>
+
+              <div class="comp-stat-box">
+                <span class="label">Monthly Expenses</span>
+                <span class="curr-val" id="repExpenseVal">$0.00</span>
+                <span class="delta-pill" id="repExpenseDelta">vs last month</span>
+              </div>
+
+              <div class="comp-stat-box">
+                <span class="label">Net Savings Rate</span>
+                <span class="curr-val" id="repSavingsRateVal">0%</span>
+                <span class="delta-pill" id="repSavingsDelta">vs last month</span>
+              </div>
+
+              <div class="comp-stat-box">
+                <span class="label">Highest Spending Area</span>
+                <span class="curr-val" id="repTopCatVal">Housing</span>
+                <span style="font-size: 0.76rem; color: var(--text-secondary);" id="repTopCatAmt">$0.00 spent</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="reports-grid">
+            <!-- Donut Chart: Category Spending Breakdown -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <div>
+                  <h3 class="card-panel-title">Spending Breakdown by Category</h3>
+                  <div class="card-panel-subtitle">Percentage share of total monthly expenses</div>
+                </div>
+              </div>
+              <div class="chart-wrapper" style="min-height: 290px;">
+                <canvas id="reportDonutChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Line/Bar Chart: Monthly Trend -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <div>
+                  <h3 class="card-panel-title">Multi-Month Income vs. Expense Trend</h3>
+                  <div class="card-panel-subtitle">Tracking financial trajectory across the semester</div>
+                </div>
+              </div>
+              <div class="chart-wrapper" style="min-height: 290px;">
+                <canvas id="reportTrendChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Supportive Saving Suggestions Section -->
+          <div class="card-panel" style="margin-top: 24px;">
+            <div class="card-panel-header">
+              <div>
+                <h3 class="card-panel-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                  Supportive Student Saving Suggestions
+                </h3>
+                <div class="card-panel-subtitle">Personalized observations based solely on your entered spending patterns</div>
+              </div>
+            </div>
+            <div class="smart-tips-container" id="reportSmartTips">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 6: SMS EXPENSE TRACKER & MOBILE SYNC                     -->
+        <!-- ============================================================= -->
+        <section class="view-section" id="view-sms">
+
+          <!-- Mobile Sync Configuration Banner -->
+          <div class="sms-config-banner">
+            <div class="sms-mobile-badge">
+              <div class="sms-phone-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </div>
+              <div>
+                <div style="font-size: 0.76rem; text-transform: uppercase; color: var(--teal-300); font-weight: 700; letter-spacing: 0.04em;">
+                  Linked Mobile Number
+                </div>
+                <div class="sms-number-display" id="smsDisplayNumber">+1 (555) 382-9104</div>
+                <div class="sms-status-indicator" id="smsStatusText">
+                  SMS Expense Tracking Active (<span id="smsCarrierText">Campus Mobile 5G</span>)
+                </div>
+              </div>
+            </div>
+
+            <div class="sms-controls-group">
+              <label class="switch-label">
+                <input type="checkbox" id="smsAutoImportToggle" checked style="display: none;">
+                <span class="switch-toggle"></span>
+                <span>Auto-Import Expenses</span>
+              </label>
+
+              <button class="btn-secondary" id="btnEditPhoneNumber" style="border-color: rgba(255,255,255,0.2); color: #ffffff; background: rgba(255,255,255,0.08);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                Change Number
+              </button>
+            </div>
+          </div>
+
+          <!-- SMS Simulator & Ingestion Tool -->
+          <div class="sms-grid-layout">
+            
+            <!-- Left: Input & Templates -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <div>
+                  <h3 class="card-panel-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Simulate or Paste Incoming Bank SMS
+                  </h3>
+                  <div class="card-panel-subtitle">Test our smart regex parser or simulate live bank notifications</div>
+                </div>
+              </div>
+
+              <!-- Quick Template Chips -->
+              <div style="margin-bottom: 12px;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Test Templates:</span>
+                <div class="sms-templates-wrap">
+                  <button type="button" class="sms-template-chip" data-template="starbucks">☕ Starbucks ($4.85)</button>
+                  <button type="button" class="sms-template-chip" data-template="traderjoe">🛒 Trader Joe's ($64.20)</button>
+                  <button type="button" class="sms-template-chip" data-template="spotify">🎧 Spotify ($5.99)</button>
+                  <button type="button" class="sms-template-chip" data-template="venmo">⚡ Venmo ($26.50)</button>
+                  <button type="button" class="sms-template-chip" data-template="uber">🚕 Uber ($14.25)</button>
+                  <button type="button" class="sms-template-chip" data-template="payroll">🎓 Payroll ($1,450.00)</button>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label">SMS Sender / Bank Handle</label>
+                <input type="text" class="form-input" id="smsSenderInput" value="CHASE-ALERT" placeholder="e.g. CHASE, HDFCBK, VENMO, +15550192">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Incoming SMS Message Body</label>
+                <textarea class="form-textarea" id="smsRawInput" rows="3" placeholder="Paste bank SMS text here... e.g. 'Your debit card ending in 4102 was charged $18.25 at CAMPUS HUB BURRITO on 09/26/2026.'"></textarea>
+              </div>
+
+              <button class="btn-primary" id="btnProcessSMS" style="width: 100%; justify-content: center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Parse &amp; Record Expense to Budget
+              </button>
+            </div>
+
+            <!-- Right: Live Detected Phone Message & Extracted Fields -->
+            <div class="phone-bubble-card">
+              <div class="imessage-header">
+                <span id="bubbleSenderLabel">From: CHASE-ALERT</span>
+                <span id="bubbleTimeLabel">Today, Just now</span>
+              </div>
+
+              <div class="imessage-bubble" id="smsBubbleText">
+                Chase Alert: Your debit card was charged $18.25 at CAMPUS HUB BURRITO on 09/26/2026. Bal: $1,420.50.
+              </div>
+
+              <div style="font-size: 0.78rem; font-weight: 800; color: var(--navy-900); margin-top: 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                <span>⚡ Extracted Transaction Breakdown</span>
+                <span class="badge-tag" id="liveConfidenceBadge" style="background: var(--emerald-100); color: #065f46; font-size: 0.7rem;">High Confidence</span>
+              </div>
+
+              <div class="parsed-result-grid">
+                <div class="parsed-field">
+                  <span class="label">Amount</span>
+                  <span class="val" id="parsedAmountVal" style="color: var(--navy-900);">$18.25</span>
+                </div>
+                <div class="parsed-field">
+                  <span class="label">Type</span>
+                  <span class="val" id="parsedTypeVal" style="color: var(--rose-500);">Expense</span>
+                </div>
+                <div class="parsed-field">
+                  <span class="label">Merchant / Payee</span>
+                  <span class="val" id="parsedMerchantVal">Campus Hub Burrito</span>
+                </div>
+                <div class="parsed-field">
+                  <span class="label">Inferred Category</span>
+                  <span class="val" id="parsedCategoryVal" style="color: var(--teal-600);">Food &amp; Dining</span>
+                </div>
+                <div class="parsed-field">
+                  <span class="label">Payment Method</span>
+                  <span class="val" id="parsedMethodVal">Debit Card</span>
+                </div>
+                <div class="parsed-field">
+                  <span class="label">Transaction Date</span>
+                  <span class="val" id="parsedDateVal">2026-09-26</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SMS Inbox & History Table -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <div>
+                <h3 class="card-panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                    <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                  </svg>
+                  Incoming SMS Transaction Logs
+                </h3>
+                <div class="card-panel-subtitle">History of parsed mobile SMS notifications</div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Received</th>
+                    <th>Sender</th>
+                    <th>Raw Message</th>
+                    <th>Parsed Merchant</th>
+                    <th>Category</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="smsLogsTableBody">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div><!-- End main-wrapper -->
+
+    <!-- ================================================================= -->
+    <!-- MOBILE BOTTOM NAVIGATION                                          -->
+    <!-- ================================================================= -->
+    <nav class="mobile-bottom-nav">
+      <button class="mobile-nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span>Overview</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="transactions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span>Entries</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="budgets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+          <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+        </svg>
+        <span>Budgets</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="goals">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="6"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+        <span>Goals</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="sms">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <span>SMS</span>
+      </button>
+    </nav>
+
+  </div><!-- End app-container -->
+
+  <!-- =================================================================== -->
+  <!-- MODAL: ADD / EDIT TRANSACTION                                       -->
+  <!-- =================================================================== -->
+  <div class="modal-overlay" id="transactionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="txModalTitle">Add Transaction</h3>
+        <button class="btn-modal-close" data-close-modal aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="transactionForm">
+        <div class="modal-body">
+          <input type="hidden" id="txTypeInput" value="expense">
+
+          <!-- Type Selector -->
+          <div class="form-group">
+            <label class="form-label">Transaction Type</label>
+            <div class="type-toggle-group">
+              <button type="button" class="type-toggle-btn active expense" data-type="expense">Expense</button>
+              <button type="button" class="type-toggle-btn income" data-type="income">Income</button>
+            </div>
+          </div>
+
+          <!-- Amount & Date -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Amount ($) <span class="req">*</span></label>
+              <input type="number" step="0.01" min="0.01" class="form-input" id="txAmountInput" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date <span class="req">*</span></label>
+              <input type="date" class="form-input" id="txDateInput" required>
+            </div>
+          </div>
+
+          <!-- Category & Payment Method -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category <span class="req">*</span></label>
+              <select class="form-select" id="txCategoryInput" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select class="form-select" id="txPaymentInput">
+                <option value="Debit Card">Debit Card</option>
+                <option value="Campus Card">Campus Card</option>
+                <option value="Apple Pay">Apple Pay / Google Pay</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Venmo">Venmo / Zelle</option>
+                <option value="Direct Deposit">Direct Deposit</option>
+                <option value="Cash">Cash</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label">Description <span class="req">*</span></label>
+            <input type="text" class="form-input" id="txDescInput" placeholder="e.g. Campus bookstore, Trader Joe's groceries, tutoring fee..." required>
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label class="form-label">Notes (Optional)</label>
+            <textarea class="form-textarea" id="txNotesInput" rows="2" placeholder="e.g. Split with roomie, textbook rental..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSaveTransaction">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: SET CATEGORY BUDGET                                          -->
+  <!-- =================================================================== -->
+  <div class="modal-overlay" id="budgetModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <div class="cat-icon-circle" id="budgetCategoryIcon" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; margin-right: 8px;"></div>
+          <span id="budgetCategoryTitle">Set Category Budget</span>
+        </h3>
+        <button class="btn-modal-close" data-close-modal aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="budgetForm">
+        <div class="modal-body">
+          <input type="hidden" id="budgetCategoryIdHidden">
+
+          <div class="form-group">
+            <label class="form-label">Monthly Spending Cap ($) <span class="req">*</span></label>
+            <input type="number" step="1" min="0" class="form-input" id="budgetAmountInput" placeholder="e.g. 250" required>
+            <span style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">
+              You'll be alerted when your spending reaches 85% of this limit.
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn-primary">Update Budget</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: ADD / EDIT SAVINGS GOAL                                      -->
+  <!-- =================================================================== -->
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="goalModalTitle">Create Savings Goal</h3>
+        <button class="btn-modal-close" data-close-modal aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="goalForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Goal Title <span class="req">*</span></label>
+            <input type="text" class="form-input" id="goalTitleInput" placeholder="e.g. Spring Break Trip, Laptop Upgrade, Emergency Cushion" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Target Amount ($) <span class="req">*</span></label>
+              <input type="number" step="1" min="1" class="form-input" id="goalTargetInput" placeholder="800" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Current Saved ($)</label>
+              <input type="number" step="1" min="0" class="form-input" id="goalCurrentInput" placeholder="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Target Date <span class="req">*</span></label>
+              <input type="date" class="form-input" id="goalDateInput" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category Tag</label>
+              <input type="text" class="form-input" id="goalTagInput" placeholder="e.g. Travel, Emergency, Gear">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Card Accent Color</label>
+            <select class="form-select" id="goalColorInput">
+              <option value="#0D9488">Teal (Recommended)</option>
+              <option value="#3B82F6">Royal Blue</option>
+              <option value="#F59E0B">Amber Gold</option>
+              <option value="#8B5CF6">Purple Accent</option>
+              <option value="#EC4899">Pink Rose</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn-primary">Save Goal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: QUICK DEPOSIT TO GOAL                                        -->
+  <!-- =================================================================== -->
+  <div class="modal-overlay" id="depositModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="depositGoalTitle">Add Savings</h3>
+        <button class="btn-modal-close" data-close-modal aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="depositForm">
+        <div class="modal-body">
+          <input type="hidden" id="depositGoalIdHidden">
+          <div class="form-group">
+            <label class="form-label">Deposit Amount ($) <span class="req">*</span></label>
+            <input type="number" step="1" min="1" class="form-input" id="depositAmountInput" placeholder="e.g. 50" required>
+            <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+              Every dollar moves you closer to financial freedom!
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn-primary">Confirm Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: CONFIRM DELETE                                               -->
+  <!-- =================================================================== -->
+  <div class="modal-overlay" id="confirmDeleteModal">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-body">
+        <div class="confirm-box">
+          <div class="confirm-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy-900); margin-bottom: 8px;">Are you sure?</h3>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 8px;">
+            You are about to delete <strong id="deleteItemName" style="color: var(--navy-900);">this item</strong>. This action cannot be undone.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: center;">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="button" class="btn-danger" id="btnConfirmDelete">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: UPDATE PHONE NUMBER FOR SMS TRACKING                        -->
+  <!-- =================================================================== -->
+  <div class="modal-overlay" id="phoneModal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          Configure Mobile SMS Sync
+        </h3>
+        <button class="btn-modal-close" data-close-modal aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="phoneConfigForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Your Mobile Phone Number <span class="req">*</span></label>
+            <input type="text" class="form-input" id="phoneModalInput" placeholder="+1 (555) 000-0000" required>
+            <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 4px;">
+              Used to match incoming bank debits, credit card alerts, and UPI transaction notifications.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mobile Carrier / Network (Optional)</label>
+            <input type="text" class="form-input" id="carrierModalInput" placeholder="e.g. Verizon, T-Mobile, Airtel, Jio">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn-primary">Save Mobile Number</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- AUTHENTICATION SCREEN: LOGIN & REGISTER WITH MOBILE NUMBER          -->
+  <!-- =================================================================== -->
+  <div class="auth-screen-overlay hidden" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-brand-header">
+        <div class="auth-logo-badge">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <h2 class="auth-brand-title">JS TRACKER</h2>
+        <p class="auth-brand-subtitle">Smart Student &amp; Personal Financial Tracker</p>
+      </div>
+
+      <!-- Segmented Tab Switcher -->
+      <div class="auth-tabs-nav">
+        <button type="button" class="auth-tab-btn active" id="authTabLogin">Sign In with Email</button>
+        <button type="button" class="auth-tab-btn" id="authTabRegister">Create New Account</button>
+      </div>
+
+      <!-- 1. SIGN IN FORM -->
+      <form id="loginForm" autocomplete="on">
+        <div class="auth-error-box" id="loginErrorAlert">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span id="loginErrorMessage">Invalid email or password</span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" for="loginEmailInput">Personal Email Address <span class="req">*</span></label>
+          <input type="email" class="form-input" id="loginEmailInput" placeholder="e.g. alex.rivera@campus.edu" required autocomplete="username">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <label class="form-label" for="loginPasswordInput">Password <span class="req">*</span></label>
+            <span style="font-size: 0.74rem; color: var(--teal-600); cursor: pointer;" onclick="App.showForgotPwdHint()">Default: password123</span>
+          </div>
+          <div class="password-input-wrap">
+            <input type="password" class="form-input" id="loginPasswordInput" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="btn-toggle-pwd" id="btnToggleLoginPwd" aria-label="Show or hide password">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+          Sign In to Dashboard
+        </button>
+
+        <div class="demo-login-divider">
+          <span>Or Quick Student Access</span>
+        </div>
+
+        <button type="button" class="btn-fast-demo" id="btnFastDemoLogin">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          Demo Login as Alex Rivera (Preloaded Data)
+        </button>
+      </form>
+
+      <!-- 2. CREATE NEW ACCOUNT (REGISTER) FORM -->
+      <form id="registerForm" style="display: none;" autocomplete="on">
+        <div class="auth-error-box" id="regErrorAlert">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span id="regErrorMessage">Please fill in all required fields</span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="regNameInput">Full Name <span class="req">*</span></label>
+          <input type="text" class="form-input" id="regNameInput" placeholder="e.g. Jordan Miller" required autocomplete="name">
+        </div>
+
+        <div class="form-row" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="regEmailInput">Personal Email <span class="req">*</span></label>
+            <input type="email" class="form-input" id="regEmailInput" placeholder="jordan@gmail.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPhoneInput">Mobile Phone Number <span class="req">*</span></label>
+            <input type="tel" class="form-input" id="regPhoneInput" placeholder="+1 (555) 000-0000" required autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="regStatusInput">Student Status / Occupation</label>
+            <input type="text" class="form-input" id="regStatusInput" placeholder="e.g. Junior Undergrad, Intern">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regCurrencyInput">Currency Preference</label>
+            <select class="form-select" id="regCurrencyInput">
+              <option value="$">$ USD / CAD</option>
+              <option value="₹">₹ INR (India)</option>
+              <option value="€">€ EUR (Europe)</option>
+              <option value="£">£ GBP (UK)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom: 8px;">
+          <div class="form-group">
+            <label class="form-label" for="regPasswordInput">Password (6+ chars) <span class="req">*</span></label>
+            <div class="password-input-wrap">
+              <input type="password" class="form-input" id="regPasswordInput" placeholder="Create password" required autocomplete="new-password">
+              <button type="button" class="btn-toggle-pwd" id="btnToggleRegPwd" aria-label="Show or hide password">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regConfirmPasswordInput">Confirm Password <span class="req">*</span></label>
+            <div class="password-input-wrap">
+              <input type="password" class="form-input" id="regConfirmPasswordInput" placeholder="Re-enter password" required autocomplete="new-password">
+              <button type="button" class="btn-toggle-pwd" id="btnToggleRegConfirmPwd" aria-label="Show or hide password">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <span id="regPwdMatchHint" style="font-size: 0.74rem; display: block; color: var(--text-muted);">
+            Password must be at least 6 characters long.
+          </span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;">
+            <input type="checkbox" id="regSmsEnableInput" checked style="margin-top: 3px;">
+            <span>Enable smart SMS expense tracking on this mobile number for bank debit &amp; UPI notifications.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+          Create Account &amp; Start Budgeting
+        </button>
+      </form>
+
+      <div style="margin-top: 18px; text-align: center;">
+        <button type="button" class="btn-secondary" id="btnCancelAuth" style="font-size: 0.78rem; padding: 6px 14px; border: none; background: transparent; color: var(--text-muted);">
+          ← Return to Dashboard
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Floating Toast Notifications Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "js-tracker",
+  "version": "1.0.0",
+  "description": "JS TRACKER - Student & Young Adult Personal Budget Planner",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "budget",
+    "tracker",
+    "finance",
+    "student",
+    "sms"
+  ],
+  "author": "",
+  "license": "MIT"
+}
